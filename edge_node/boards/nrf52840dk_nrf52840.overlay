@@ -1,0 +1,37 @@
+/*
+ * nrf52840dk_nrf52840.overlay -- IAQ edge node
+ *
+ * I2C0 on the nRF52840 DK Arduino header defaults to:
+ *     SDA = P0.26 , SCL = P0.27
+ * All I2C sensors (SCD41, SPS30, CCS811, MCP9808) share this bus.
+ * If you want different pins, add a &pinctrl block; otherwise these are used.
+ *
+ * The LDR divider midpoint goes to analog input AIN0 = P0.02.
+ */
+
+&i2c0 {
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_STANDARD>;   /* 100 kHz -- safest */
+};
+
+/* SAADC channel 0 -> AIN0 (P0.02) for the LDR divider. */
+&adc {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	channel@0 {
+		reg = <0>;
+		zephyr,gain = "ADC_GAIN_1_6";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, 10)>;
+		zephyr,input-positive = <NRF_SAADC_AIN0>;
+		zephyr,resolution = <12>;
+	};
+};
+
+/ {
+	zephyr,user {
+		io-channels = <&adc 0>;
+	};
+};

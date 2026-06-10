@@ -1,0 +1,19 @@
+/*
+ * nrf52840dongle_nrf52840.overlay -- IAQ gateway
+ *
+ * Defines a USB CDC ACM serial port and makes it the system console, so that
+ * printk() in main.c streams JSON lines out of the dongle's native USB to the
+ * host PC.
+ */
+
+&zephyr_udc0 {
+	cdc_acm_uart0: cdc_acm_uart0 {
+		compatible = "zephyr,cdc-acm-uart";
+	};
+};
+
+/ {
+	chosen {
+		zephyr,console = &cdc_acm_uart0;
+	};
+};
